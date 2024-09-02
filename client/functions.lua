@@ -51,7 +51,12 @@ end
 ---@param txt any
 ---@param style string
 local function notify(txt, style)
-    lib.notify({description = txt, type = style, icon = "compass"})
+    --[[ lib.notify({description = txt, type = style, icon = "compass"}) ]]
+    CORE.NUI.notification({
+        message = txt,
+        type = style,
+        duration = 5000
+    })
 end
 
 ---Function used to check if an entity is inside the zone
@@ -76,7 +81,7 @@ local function DisableCollisionsThisFrame(one, two)
 end
 
 local function setVehicleCanCosmDamage(vehicle, state)
-	SetVehicleCanBeVisiblyDamaged(vehicle, not state)
+    SetVehicleCanBeVisiblyDamaged(vehicle, not state)
     SetVehicleReceivesRampDamage(vehicle, not state)
     SetVehicleHasUnbreakableLights(vehicle, state)
     SetVehicleTyresCanBurst(vehicle, not state)
@@ -88,13 +93,13 @@ end
 
 local function setVehicleCanMechDamage(vehicle, state)
     SetEntityProofs(vehicle, state, state, state, state, state, state, state, state)
-	SetVehicleEngineCanDegrade(vehicle, not state)
-	SetVehicleCanBreak(vehicle, not state)
-	SetVehicleWheelsCanBreak(vehicle, not state)
-	SetDisableVehiclePetrolTankDamage(vehicle, state)
+    SetVehicleEngineCanDegrade(vehicle, not state)
+    SetVehicleCanBreak(vehicle, not state)
+    SetVehicleWheelsCanBreak(vehicle, not state)
+    SetDisableVehiclePetrolTankDamage(vehicle, state)
     SetDisableVehiclePetrolTankFires(vehicle, state)
     SetDisableVehicleEngineFires(vehicle, state)
-	SetVehicleStrong(vehicle, state)
+    SetVehicleStrong(vehicle, state)
     SetEntityCanBeDamaged(vehicle, state)
 end
 
@@ -268,8 +273,9 @@ function OnEnter(self)
 
     -- Players configurations
     if self.zonetype.player then
+        CORE.SafezoneService.setSafezoneStatus(true)
         if self.zonetype.player.areaNotify then
-            notify("You entered a safe zone.", "success")
+            notify("Bạn đã vào vùng an toàn.", "success")
         end
 
         if (self.zonetype.player.kickAFK) and (self.zonetype.player.kickAFK > 0) then
@@ -285,7 +291,8 @@ function OnEnter(self)
                             if self.zonetype.player.kickNotify then
                                 for _, notifyTime in ipairs(Config.afkNotifyTimes) do
                                     if afkTime == math.ceil(self.zonetype.player.kickAFK / notifyTime) then
-                                        notify(("You are AFK, in %d you will be kicked by the server."):format(afkTime), "warning")
+                                        notify(("You are AFK, in %d you will be kicked by the server."):format(afkTime),
+                                            "warning")
                                         break
                                     end
                                 end
@@ -353,13 +360,13 @@ function OnEnter(self)
 
         CreateThread(function()
             while LocalPlayer.state.safezone do
-                for ped,pedOptions in pairs(stashedPeds) do
+                for ped, pedOptions in pairs(stashedPeds) do
                     if not entityIsInZone(self, ped) then
                         unstashPed(ped, pedOptions)
                     end
                 end
 
-                for ped,pedOptions in pairs(stashedPlayerPeds) do
+                for ped, pedOptions in pairs(stashedPlayerPeds) do
                     if not entityIsInZone(self, ped) then
                         unstashPlayerPed(ped, pedOptions)
                     end
@@ -373,7 +380,7 @@ function OnEnter(self)
             CreateThread(function()
                 while LocalPlayer.state.safezone do
                     if next(stashedPeds) then
-                        for ped,_ in pairs(stashedPeds) do
+                        for ped, _ in pairs(stashedPeds) do
                             if cache.vehicle then
                                 DisableCollisionsThisFrame(cache.vehicle, ped)
                             else
@@ -416,7 +423,7 @@ function OnEnter(self)
 
         CreateThread(function()
             while LocalPlayer.state.safezone do
-                for vehicle,vehicleOptions in pairs(stashedVehicles) do
+                for vehicle, vehicleOptions in pairs(stashedVehicles) do
                     if not entityIsInZone(self, vehicle) then
                         unstashVehicle(vehicle, vehicleOptions)
                     end
@@ -430,7 +437,7 @@ function OnEnter(self)
             CreateThread(function()
                 while LocalPlayer.state.safezone do
                     if next(stashedVehicles) then
-                        for vehicle,_ in pairs(stashedVehicles) do
+                        for vehicle, _ in pairs(stashedVehicles) do
                             if cache.vehicle then
                                 DisableCollisionsThisFrame(cache.vehicle, vehicle)
                             else
@@ -438,11 +445,9 @@ function OnEnter(self)
                             end
                         end
                         Wait(1)
-
                     else
                         Wait(500)
                     end
-
                 end
             end)
         end
@@ -459,8 +464,9 @@ function OnExit(self)
 
     -- Players configurations
     if self.zonetype.player then
+        CORE.SafezoneService.setSafezoneStatus(false)
         if self.zonetype.player.areaNotify then
-            notify("You left the safe zone.", "success")
+            notify("Bạn đã rời khỏi vùng an toàn.", "warning")
         end
 
         if self.zonetype.player.disableShoot then
@@ -486,13 +492,13 @@ function OnExit(self)
 
     -- Peds configurations
     if self.zonetype.ped then
-        for ped,pedOptions in pairs(stashedPeds) do
+        for ped, pedOptions in pairs(stashedPeds) do
             unstashPed(ped, pedOptions)
         end
 
         -- Other player peds configurations
         if self.zonetype.ped.playerPeds then
-            for ped,pedOptions in pairs(stashedPlayerPeds) do
+            for ped, pedOptions in pairs(stashedPlayerPeds) do
                 unstashPlayerPed(ped, pedOptions)
             end
         end
@@ -500,7 +506,7 @@ function OnExit(self)
 
     -- Vehicle configurations
     if self.zonetype.vehicle then
-        for vehicle,vehicleOptions in pairs(stashedVehicles) do
+        for vehicle, vehicleOptions in pairs(stashedVehicles) do
             unstashVehicle(vehicle, vehicleOptions)
         end
     end
@@ -537,17 +543,17 @@ AddEventHandler('onResourceStop', function(resourceName)
     if (cache.resource ~= resourceName) then return end
 
     -- Peds configurations
-    for ped,pedOptions in pairs(stashedPeds) do
+    for ped, pedOptions in pairs(stashedPeds) do
         unstashPed(ped, pedOptions)
     end
 
     -- Other player peds configurations
-    for ped,pedOptions in pairs(stashedPlayerPeds) do
+    for ped, pedOptions in pairs(stashedPlayerPeds) do
         unstashPlayerPed(ped, pedOptions)
     end
 
     -- Vehicle configurations
-    for vehicle,vehicleOptions in pairs(stashedVehicles) do
+    for vehicle, vehicleOptions in pairs(stashedVehicles) do
         unstashVehicle(vehicle, vehicleOptions)
     end
 end)

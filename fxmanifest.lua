@@ -15,7 +15,7 @@ download "https://github.com/Fancazista/fanca_safezone/"
 
 shared_scripts {
 	'@ox_lib/init.lua',
-    '@es_extended/imports.lua',
+	'@ProjectStarboy/imports.lua',
 
 	'config.lua'
 }

@@ -9,8 +9,9 @@ Config.debug = false --- Enable debugging messages
 
 Config.ghostedEntitiesAlpha = 100
 
-Config.afkDropMessage = "You got kicked from the server for: AFK in safe zone." --- Message sent when player is disconnected because AFK
-Config.afkNotifyTimes = {2, 3, 6, 10}
+Config.afkDropMessage =
+"You got kicked from the server for: AFK in safe zone." --- Message sent when player is disconnected because AFK
+Config.afkNotifyTimes = { 2, 3, 6, 10 }
 
 ---Function triggered when the player holds a weapon and he must be disarmed
 Config.disarmPlayer = function()
@@ -102,7 +103,7 @@ Config.Zones = {
             label = "Safe zone",
             display = 2,
             id = 461,
-            color = 66,
+            color = 2,
             scale = 0.8,
         },
 
@@ -141,7 +142,7 @@ Config.Zones = {
             label = "Safe zone",
             display = 2,
             id = 461,
-            color = 66,
+            color = 2,
             scale = 0.8,
         },
 
